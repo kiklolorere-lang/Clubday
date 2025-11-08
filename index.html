@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cyberverse CTF — Start</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:"JetBrains Mono",monospace}
+  :root{
+    --bg1: #0b1020;
+    --bg2: #071029;
+    --card: rgba(255,255,255,0.05);
+    --muted: #bfc7d6;
+    --accent1: #7cffb2;
+    --accent2: #00e0ff;
+    --glass: rgba(255,255,255,0.03);
+  }
+  body{
+    min-height:100vh;
+    background: radial-gradient(circle at 15% 10%, #091124 0%, var(--bg1) 35%, var(--bg2) 100%);
+    color: #e6eef8;
+    line-height:1.6;
+  }
+  .wrap{max-width:980px;margin:36px auto;padding:20px;}
+  .logo{
+    width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),#7c3aed);
+    display:grid;place-items:center;font-weight:800;color:#001;box-shadow:0 6px 24px rgba(0,0,0,0.6);
+    margin-bottom:20px;
+  }
+  h1{font-size:32px;color:var(--accent1);text-shadow:0 0 16px rgba(124,255,178,0.2)}
+  .lead{color:var(--muted);margin-top:6px;max-width:900px;font-size:18px;margin-bottom:32px;line-height:1.8}
+  button{
+    background:linear-gradient(90deg,var(--accent2),#7c3aed);
+    color:#fff;border:none;padding:14px 26px;border-radius:14px;cursor:pointer;font-weight:700;
+    box-shadow:0 12px 28px rgba(0,0,0,0.5);transition:all .2s;
+    font-size:17px;
+  }
+  button:hover{transform:translateY(-2px) scale(1.02);opacity:0.95;}
+  section{margin-top:20px;padding:26px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 10px 40px rgba(2,6,23,0.7);border:1px solid rgba(255,255,255,0.03)}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  h2{color:var(--accent2);font-size:26px;margin:0;text-shadow:0 0 10px rgba(0,224,255,0.1)}
+  .desc{color:var(--muted);font-size:16px;margin-top:8px;line-height:1.6}
+  .puzzle-box{
+    background:var(--card);padding:24px;border-radius:16px;border:1px solid rgba(255,255,255,0.05);margin-bottom:24px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .cipher{
+    font-size:30px;font-weight:800;letter-spacing:3px;padding:18px;border-radius:14px;
+    background:var(--glass);text-align:center;margin-bottom:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  }
+  input[type="text"]{
+    width:100%;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);
+    background:transparent;color:#eaf2ff;font-size:18px;margin-top:10px;outline:none;
+    transition:all .2s;
+  }
+  input[type="text"]:focus{border-color:var(--accent2);box-shadow:0 0 12px rgba(0,224,255,0.4);}
+  .actions{display:flex;gap:12px;margin-top:16px;align-items:center}
+  .result{margin-top:16px;font-size:17px;color:var(--muted)}
+  .ok{color:#b6f2d2;font-weight:600;font-size:18px;}
+  .bad{color:#ffb6c1;font-weight:600;font-size:18px;}
+  a.resource{color:var(--accent2);text-decoration:underline;}
+  ul.desc{margin-left:20px;margin-top:8px;}
+
+  /* Modal Styles */
+  .modal{
+    position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);
+    display:flex;justify-content:center;align-items:flex-start;
+    padding-top:50px;
+    opacity:0;pointer-events:none;
+    transition:opacity 0.3s ease;
+  }
+  .modal.show{opacity:1;pointer-events:auto;}
+  .modal-content{
+    background:linear-gradient(135deg,#0f1124,#14162f);
+    border-radius:20px;padding:36px 28px;
+    max-width:600px;width:90%;
+    text-align:left; /* left-aligned text */
+    box-shadow:0 10px 40px rgba(0,0,0,0.7);
+    animation:popIn 0.4s ease forwards;
+  }
+  @keyframes popIn{
+    0%{transform:scale(0.7);opacity:0;}
+    100%{transform:scale(1);opacity:1;}
+  }
+  .modal-content h2{font-size:32px;color:var(--accent1);margin-bottom:16px;}
+  .modal-content p{color:#fff;font-size:18px;line-height:1.6;margin-bottom:20px;}
+  .modal-content ul{
+    margin-top:12px;
+    margin-left:18px;
+  }
+  .modal-content a.resource{
+    color:var(--accent2);
+    text-decoration:underline;
+    font-weight:500;
+  }
+  .modal-content .signature{
+    color:var(--accent2);
+    font-weight:600;
+    margin-top:24px;
+    font-size:16px;
+  }
+
+  /* small helper for badge */
+  .hint-badge{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);font-size:13px;margin-top:8px}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:10px 14px;border-radius:12px}
+  pre.flag{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;overflow:auto;color:var(--accent1);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Start Page -->
+  <section id="startPage">
+    <div class="logo">CV</div>
+    <h1>Welcome to Cyberverse CTF</h1>
+    <p class="lead">
+      A CTF (Capture The Flag) is a cybersecurity competition where participants solve challenges to find hidden "flags".  
+      These challenges help you learn practical skills like cryptography, web hacking, forensics, OSINT, and reverse engineering.  
+      CTFs are not just fun—they can help you <strong>gain experience and open career opportunities</strong> in cybersecurity.  
+      Every challenge you solve brings you closer to mastery!
+    </p>
+    <button id="startBtn">Start the Challenges</button>
+  </section>
+
+  <section id="challengesPage" style="display:none">
+
+    <section id="crypto">
+      <div class="section-head"><h2> Crypto Challenge</h2></div>
+      <p class="desc">Decrypt the Caesar cipher (shift +3). Enter your answer <strong>in the Cyberverse{...} format</strong>.</p>
+      <div class="puzzle-box">
+        <div class="cipher" id="cipherText"></div>
+        <input type="text" id="cryptoInput" placeholder="Enter Cyberverse{...}" required>
+        <div class="actions"><button id="cryptoBtn">Submit</button></div>
+        <div id="cryptoResult" class="result"></div>
+      </div>
+    </section>
+
+    <section id="osint" style="display:none">
+      <div class="section-head"><h2> OSINT Challenge</h2></div>
+      <p class="desc">Identify the museum for this famous ancient bust:<br><em>A queen known for her beauty and strength (Nefertiti).</em><br>Enter your answer <strong>in the Cyberverse{...} format</strong>.</p>
+      <div class="puzzle-box">
+        <input type="text" id="osintInput" placeholder="Enter Cyberverse{...}" required>
+        <div class="actions"><button id="osintBtn">Submit</button></div>
+        <div id="osintResult" class="result"></div>
+      </div>
+    </section>
+
+    <section id="searchChallenge" style="display:none">
+      <div class="section-head"><h2> Search Challenge (Simulated SQLi)</h2></div>
+      <p class="desc">
+        This is a <strong>simulated</strong> search challenge that models a search over a database.  
+        <span class="hint-badge">Educational simulation — not a real vulnerable server</span><br>
+        Your task: find the record that contains the flag. Enter the flag <strong>in the Cyberverse{...} format</strong>.
+      </p>
+      <div class="puzzle-box">
+        <div style="margin-bottom:12px;color:var(--muted);font-size:15px;">
+          Search the database (simulated). Try queries like keywords — or type common SQLi payloads (e.g. <code>' OR </code>) to simulate a leak.
+        </div>
+        <input type="text" id="searchInput" placeholder="Type search keywords or SQLi payload..." />
+        <div class="actions" style="margin-top:12px;">
+          <button id="searchBtn">Search</button>
+          <button id="submitSearchFlag" class="ghost">Submit Flag</button>
+        </div>
+        <div id="searchResult" class="result"></div>
+        <div style="margin-top:14px;color:var(--muted);font-size:14px;">
+          <strong>Note:</strong> This challenge simulates database records client-side. For real-world, safe practice use controlled labs like DVWA or Juice Shop (links in final popup).
+        </div>
+      </div>
+    </section>
+
+  </section>
+</div>
+
+<div class="modal" id="completionModal">
+  <div class="modal-content">
+    <h2>🎉 Congratulations!</h2>
+    <p>
+      You've completed the initial challenges. This is the <strong>first step on your journey to success</strong> in cybersecurity.
+      CTFs provide hands-on experience that is invaluable for your career. Keep learning, exploring, and never stop improving!
+    </p>
+    <p>Here are some recommended resources to continue your journey:</p>
+    <ul>
+      <li><a class="resource" href="https://ctftime.org/" target="_blank">CTFTime — Track upcoming CTFs</a></li>
+      <li><a class="resource" href="https://picoctf.org/" target="_blank">picoCTF — Beginner-friendly challenges</a></li>
+      <li><a class="resource" href="https://hackthebox.eu/" target="_blank">Hack The Box — Practical hacking labs</a></li>
+      <li><a class="resource" href="https://overthewire.org/" target="_blank">OverTheWire — Wargames</a></li>
+      <li><a class="resource" href="https://owasp.org/www-project-juice-shop/" target="_blank">OWASP Juice Shop — Vulnerable app for learning</a></li>
+      <li><a class="resource" href="https://www.owasp.org/index.php/OWASP_WebGoat_Project" target="_blank">WebGoat — Web security lessons</a></li>
+    </ul>
+    <p class="signature">
+      With regards,<br>
+      MH<br>
+      Cybersecurity Head
+    </p>
+    <button id="closeModal">Close</button>
+  </div>
+</div>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const startPage = document.getElementById("startPage");
+const challengesPage = document.getElementById("challengesPage");
+
+startBtn.addEventListener('click', ()=>{
+  startPage.style.display = "none";
+  challengesPage.style.display = "block";
+  initChallenges();
+});
+
+function initChallenges(){
+  function caesarEncrypt(text, shift=3){
+    return text.replace(/[a-z]/gi, c => {
+      const base = c === c.toUpperCase() ? 65 : 97;
+      return String.fromCharCode((c.charCodeAt(0) - base + shift) % 26 + base);
+    });
+  }
+
+  const words = ["cyber","matrix","crypto","flag","neon","quantum","secure","signal"];
+  const chosen = words[Math.floor(Math.random()*words.length)];
+  const ciphered = caesarEncrypt(chosen,3).toUpperCase();
+  document.getElementById("cipherText").textContent = ciphered;
+
+  const cryptoBtn = document.getElementById("cryptoBtn");
+  const cryptoInput = document.getElementById("cryptoInput");
+  const cryptoResult = document.getElementById("cryptoResult");
+  const osintSection = document.getElementById("osint");
+  const searchSection = document.getElementById("searchChallenge");
+
+  cryptoBtn.addEventListener('click', ()=>{
+    const val = cryptoInput.value.trim();
+    cryptoBtn.disabled = true; cryptoInput.disabled = true;
+    if(/^cyberverse\{.*\}$/i.test(val)){
+      cryptoResult.innerHTML = "<span class='ok'>✅ Correct!</span><br>Unlocking next challenge...";
+      setTimeout(()=>{ osintSection.style.display="block"; osintSection.scrollIntoView({behavior:"smooth"}); },1000);
+    } else {
+      cryptoResult.innerHTML = "<span class='bad'>❌ Invalid format! Use Cyberverse{...}</span>";
+      cryptoBtn.disabled=false; cryptoInput.disabled=false;
+    }
+  });
+
+  const osintBtn = document.getElementById("osintBtn");
+  const osintInput = document.getElementById("osintInput");
+  const osintResult = document.getElementById("osintResult");
+
+  const validAnswers = ["neues museum","neues museum berlin","staatliche museen zu berlin"];
+
+  osintBtn.addEventListener('click', ()=>{
+    const val = osintInput.value.trim();
+    osintBtn.disabled=true; osintInput.disabled=true;
+    const match = val.match(/^cyberverse\{(.+)\}$/i);
+    if(match){
+      const answer = match[1].toLowerCase().trim();
+      if(validAnswers.includes(answer)){
+        osintResult.innerHTML = "<span class='ok'>✅ Correct! Unlocking final challenge...</span>";
+        setTimeout(()=>{ searchSection.style.display="block"; searchSection.scrollIntoView({behavior:"smooth"}); },1000);
+      } else {
+        osintResult.innerHTML = "<span class='bad'>❌ Incorrect answer inside Cyberverse{...}.</span>";
+        osintBtn.disabled=false; osintInput.disabled=false;
+      }
+    } else {
+      osintResult.innerHTML = "<span class='bad'>❌ Invalid format! Use Cyberverse{...}</span>";
+      osintBtn.disabled=false; osintInput.disabled=false;
+    }
+  });
+
+
+  const simulatedDB = [
+    { id:1, title:"Museum guide", content:"information about exhibits", owner:"staff" },
+    { id:2, title:"Bust artist", content:"Thutmose workshop", owner:"archive" },
+    { id:3, title:"Ancient record", content:"notes on Nefertiti bust", owner:"research" },
+    { id:99, title:"secret_record", content:"DB_FLAG_SECRET_NEf3rt1t1", owner:"private" }
+  ];
+
+  const searchInput = document.getElementById("searchInput");
+  const searchBtn = document.getElementById("searchBtn");
+  const submitSearchFlag = document.getElementById("submitSearchFlag");
+  const searchResult = document.getElementById("searchResult");
+
+  const sqliPatterns = [
+    "' or '1'='1",
+    "' or 1=1 --",
+    "\" or \"\"=\"",
+    "\" or 1=1 /*",
+    "' or '1'='1' --",
+    "' OR '1'='1' -- -",
+    "' OR 1=1 --",
+    "or 1=1",
+    "1=1",
+    "'; --",
+    "'; drop table",
+    "union select",
+    "/*",
+    "--",
+    ";",
+    "all"
+  ];
+
+  searchBtn.addEventListener('click', ()=>{
+    const raw = (searchInput.value || "").trim();
+    const q = raw.toLowerCase();
+    if(!q){
+      searchResult.innerHTML = "<span class='bad'>Enter some keywords to search the simulated DB.</span>";
+      return;
+    }
+
+    const looksLikeSqli = sqliPatterns.some(p => q.includes(p)) || /\bor\b/.test(q) && /1=1|true/.test(q) || /\bunion\b/.test(q);
+
+    let found;
+    if(looksLikeSqli){
+      found = simulatedDB;
+    } else {
+      found = simulatedDB.filter(r =>
+        r.title.toLowerCase().includes(q) ||
+        r.content.toLowerCase().includes(q) ||
+        r.owner.toLowerCase().includes(q)
+      );
+    }
+
+    if(found.length === 0){
+      searchResult.innerHTML = "<span class='bad'>No records matched your keywords.</span>";
+    } else {
+      let html = "<div style='color:var(--muted);font-size:15px;margin-bottom:8px;'>Records found:</div><ul style='margin-left:18px'>";
+      found.forEach(r => {
+        html += `<li>id: ${r.id} — title: <strong>${escapeHtml(r.title)}</strong> — owner: <strong>${escapeHtml(r.owner)}</strong> — content: <pre class="flag">${escapeHtml(r.content)}</pre></li>`;
+      });
+      html += "</ul><div style='margin-top:10px;color:var(--muted);font-size:14px;'>If you found the flag text above, click <em>Submit Flag</em> and enter <code>Cyberverse{...}</code>.</div>";
+      searchResult.innerHTML = html;
+    }
+  });
+
+  submitSearchFlag.addEventListener('click', ()=>{
+    const userVal = prompt("Enter flag in Cyberverse{...} format:");
+    if(!userVal){
+      return;
+    }
+    const v = userVal.trim();
+    if(!/^cyberverse\{.+\}$/i.test(v)){
+      alert("Invalid format — use Cyberverse{...}");
+      return;
+    }
+    const match = v.match(/^cyberverse\{(.+)\}$/i);
+    const inner = match ? match[1].trim() : "";
+    const flagRecord = simulatedDB.find(r => r.id === 99);
+    if(flagRecord && inner === flagRecord.content){
+      searchResult.innerHTML = "<span class='ok'>✅ Correct flag submitted!</span>";
+      const modal = document.getElementById("completionModal");
+      setTimeout(()=>{ modal.classList.add("show"); }, 700);
+    } else {
+      searchResult.innerHTML = "<span class='bad'>❌ That flag is incorrect.</span>";
+    }
+  });
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});
+  }
+
+  const closeModal = document.getElementById("closeModal");
+  closeModal.addEventListener('click', ()=> {
+    document.getElementById("completionModal").classList.remove("show");
+  });
+}
+</script>
+</body>
+</html>
